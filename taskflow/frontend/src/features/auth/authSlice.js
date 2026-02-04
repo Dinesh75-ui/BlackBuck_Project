@@ -3,11 +3,16 @@ import api from "../../api/axios";
 
 export const login = createAsyncThunk(
   "auth/login",
-  async (data) => {
-    const res = await api.post("/auth/login", data);
-    return res.data;
+  async (data, { rejectWithValue }) => {
+    try {
+      const res = await api.post("/auth/login", data);
+      return res.data;
+    } catch (err) {
+      return rejectWithValue(err.response?.data || "Login failed");
+    }
   }
 );
+
 
 const authSlice = createSlice({
   name: "auth",
@@ -23,5 +28,7 @@ const authSlice = createSlice({
     });
   },
 });
+
+
 
 export default authSlice.reducer;

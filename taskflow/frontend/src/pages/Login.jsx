@@ -2,95 +2,69 @@ import { useState } from "react";
 import { useDispatch } from "react-redux";
 import { login } from "../features/auth/authSlice";
 import { useNavigate } from "react-router-dom";
+import "./Login.css";
 
 export default function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false);
+
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const res = await dispatch(login({ email, password })).unwrap();
+    setLoading(true);
 
-    if (res.role === "ADMIN") navigate("/admin/dashboard");
-    if (res.role === "MANAGER") navigate("/manager/dashboard");
-    if (res.role === "USER") navigate("/user/dashboard");
+    try {
+      const res = await dispatch(login({ email, password })).unwrap();
+
+      if (res.role === "ADMIN") navigate("/admin/dashboard");
+      if (res.role === "MANAGER") navigate("/manager/dashboard");
+      if (res.role === "USER") navigate("/user/dashboard");
+    } catch (err) {
+      console.error("Login failed", err);
+    } finally {
+      setLoading(false);
+    }
   };
 
-return (
-  <div className="min-h-screen flex items-center justify-center bg-gray-100">
-    <div className="w-full max-w-sm bg-white rounded-xl shadow-lg p-8">
-      
-      {/* Header */}
-      <div className="mb-6">
-        <h1 className="text-2xl font-bold text-gray-900">
-          Welcome back
-        </h1>
-        <p className="text-sm text-gray-500 mt-1">
-          Please enter your details
-        </p>
-      </div>
-
-      {/* Form */}
-      <form onSubmit={handleSubmit} className="space-y-4">
-        
-        {/* Email */}
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
-            Email address
-          </label>
-          <input
-            type="email"
-            className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-purple-600"
-            onChange={(e) => setEmail(e.target.value)}
-            required
-          />
+  return (
+    <div className="login-page">
+      <div className="login-card">
+        <div className="login-header">
+          <h1>TaskFlow</h1>
+          <p>Role-based Project & Task Management</p>
         </div>
 
-        {/* Password */}
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
-            Password
-          </label>
-          <input
-            type="password"
-            className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-purple-600"
-            onChange={(e) => setPassword(e.target.value)}
-            required
-          />
-        </div>
-
-        {/* Remember + Forgot */}
-        <div className="flex items-center justify-between text-sm">
-          <label className="flex items-center gap-2 text-gray-600">
+        <form onSubmit={handleSubmit} className="login-form">
+          <div className="form-group">
+            <label>Email</label>
             <input
-              type="checkbox"
-              className="rounded border-gray-300 text-purple-600 focus:ring-purple-600"
+              type="email"
+              placeholder="Enter your email"
+              onChange={(e) => setEmail(e.target.value)}
+              required
             />
-            Remember for 30 days
-          </label>
+          </div>
 
-          <button
-            type="button"
-            className="text-purple-600 hover:underline"
-          >
-            Forgot password
+          <div className="form-group">
+            <label>Password</label>
+            <input
+              type="password"
+              placeholder="Enter your password"
+              onChange={(e) => setPassword(e.target.value)}
+              required
+            />
+          </div>
+
+          <button type="submit" disabled={loading}>
+            {loading ? "Signing in..." : "Sign In"}
           </button>
-        </div>
+        </form>
 
-        {/* Button */}
-        <button
-          type="submit"
-          className="w-full bg-purple-600 text-white py-2.5 rounded-md font-medium hover:bg-purple-700 transition"
-        >
-          Sign in
-        </button>
-      </form>
+        <p className="footer">© {new Date().getFullYear()} TaskFlow</p>
+      </div>
     </div>
-  </div>
-);
-
-
-
+  );
 }
