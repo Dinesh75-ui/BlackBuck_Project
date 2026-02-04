@@ -1,0 +1,15 @@
+# dependencies
+node_modules/
+
+# environment variables
+.env
+
+# build outputs
+dist/
+build/
+
+# prisma generated
+/src/generated/prisma
+
+# OS junk
+.DS_Store
