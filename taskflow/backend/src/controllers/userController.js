@@ -61,16 +61,26 @@ export const createUser = async (req, res) => {
 // Update user (Admin only)
 export const updateUser = async (req, res) => {
     const { id } = req.params;
-    const { name, email, role } = req.body;
+    const { name, email, role, password } = req.body;
 
     try {
+        const updateData = { name, email, role };
+
+        // If password is provided, hash it and add to update data
+        if (password && password.trim() !== "") {
+            const hashedPassword = await bcrypt.hash(password, 10);
+            updateData.password = hashedPassword;
+        }
+
         const user = await prisma.user.update({
             where: { id },
-            data: { name, email, role },
+            data: updateData,
         });
+
         res.json({ message: "User updated successfully", user });
     } catch (err) {
-        res.status(500).json({ message: "Failed to update user" });
+        console.error("UPDATE USER ERROR:", err);
+        res.status(500).json({ message: "Failed to update user", error: err.message });
     }
 };
 
