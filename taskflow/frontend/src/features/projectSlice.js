@@ -5,7 +5,7 @@ import { createTask } from "./taskSlice"; // import creation thunk
 // simple fetch project list
 export const fetchProjects = createAsyncThunk("projects/fetchAll", async (_, { rejectWithValue }) => {
     try {
-        const { data } = await api.get("/projects");
+        const { data } = await api.get("/api/projects");
         return data;
     } catch (err) {
         return rejectWithValue(err.response?.data?.message || "fetch fail");
@@ -15,7 +15,7 @@ export const fetchProjects = createAsyncThunk("projects/fetchAll", async (_, { r
 // create new project
 export const createProject = createAsyncThunk("projects/create", async (projectData, { rejectWithValue }) => {
     try {
-        const { data } = await api.post("/projects", projectData);
+        const { data } = await api.post("/api/projects", projectData);
         return data;
     } catch (err) {
         return rejectWithValue(err.response?.data?.message || "create fail");
@@ -25,7 +25,7 @@ export const createProject = createAsyncThunk("projects/create", async (projectD
 // updating project details
 export const updateProject = createAsyncThunk("projects/update", async ({ id, ...data }, { rejectWithValue }) => {
     try {
-        const { data: updatedProject } = await api.put(`/projects/${id}`, data);
+        const { data: updatedProject } = await api.put(`/api/projects/${id}`, data);
         return updatedProject;
     } catch (err) {
         return rejectWithValue(err.response?.data?.message || "update fail");
@@ -35,7 +35,7 @@ export const updateProject = createAsyncThunk("projects/update", async ({ id, ..
 // adding member to team
 export const addMember = createAsyncThunk("projects/addMember", async ({ id, userId }, { rejectWithValue }) => {
     try {
-        const { data: updatedProject } = await api.post(`/projects/${id}/members`, { userId });
+        const { data: updatedProject } = await api.post(`/api/projects/${id}/members`, { userId });
         return updatedProject;
     } catch (err) {
         return rejectWithValue(err.response?.data?.message || "add memb fail");
@@ -45,7 +45,7 @@ export const addMember = createAsyncThunk("projects/addMember", async ({ id, use
 // remove member from team
 export const removeMember = createAsyncThunk("projects/removeMember", async ({ id, userId }, { rejectWithValue }) => {
     try {
-        await api.delete(`/projects/${id}/members/${userId}`);
+        await api.delete(`/api/projects/${id}/members/${userId}`);
         return { id, userId };
     } catch (err) {
         return rejectWithValue(err.response?.data?.message || "rm memb fail");
@@ -55,7 +55,7 @@ export const removeMember = createAsyncThunk("projects/removeMember", async ({ i
 // delete project
 export const deleteProject = createAsyncThunk("projects/delete", async (id, { rejectWithValue }) => {
     try {
-        await api.delete(`/projects/${id}`);
+        await api.delete(`/api/projects/${id}`);
         return id;
     } catch (err) {
         return rejectWithValue(err.response?.data?.message || "del fail");

@@ -3,7 +3,7 @@ import api from "../api/axios";
 
 export const fetchTasks = createAsyncThunk("tasks/fetchAll", async (projectId, { rejectWithValue }) => {
     try {
-        const url = projectId ? `/tasks?projectId=${projectId}` : "/tasks";
+        const url = projectId ? `/api/tasks?projectId=${projectId}` : "/api/tasks";
         const { data } = await api.get(url);
         return data;
     } catch (err) {
@@ -13,7 +13,7 @@ export const fetchTasks = createAsyncThunk("tasks/fetchAll", async (projectId, {
 
 export const createTask = createAsyncThunk("tasks/create", async (taskData, { rejectWithValue }) => {
     try {
-        const { data } = await api.post("/tasks", taskData);
+        const { data } = await api.post("/api/tasks", taskData);
         return data;
     } catch (err) {
         return rejectWithValue(err.response?.data?.message || "Failed to create task");
@@ -22,7 +22,7 @@ export const createTask = createAsyncThunk("tasks/create", async (taskData, { re
 
 export const updateTaskStatus = createAsyncThunk("tasks/updateStatus", async ({ id, status }, { rejectWithValue }) => {
     try {
-        const { data } = await api.patch(`/tasks/${id}`, { status });
+        const { data } = await api.patch(`/api/tasks/${id}`, { status });
         return data;
     } catch (err) {
         return rejectWithValue(err.response?.data?.message || "Failed to update task");
@@ -31,7 +31,7 @@ export const updateTaskStatus = createAsyncThunk("tasks/updateStatus", async ({ 
 
 export const deleteTask = createAsyncThunk("tasks/delete", async (id, { rejectWithValue }) => {
     try {
-        await api.delete(`/tasks/${id}`);
+        await api.delete(`/api/tasks/${id}`);
         return id;
     } catch (err) {
         return rejectWithValue(err.response?.data?.message || "Failed to delete task");

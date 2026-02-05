@@ -3,7 +3,7 @@ import api from "../api/axios";
 
 export const fetchUsers = createAsyncThunk("users/fetchAll", async (_, { rejectWithValue }) => {
     try {
-        const { data } = await api.get("/users");
+        const { data } = await api.get("/api/users");
         return data;
     } catch (err) {
         return rejectWithValue(err.response?.data?.message || "Failed to fetch users");
@@ -12,7 +12,7 @@ export const fetchUsers = createAsyncThunk("users/fetchAll", async (_, { rejectW
 
 export const createUser = createAsyncThunk("users/create", async (userData, { rejectWithValue }) => {
     try {
-        const { data } = await api.post("/users", userData);
+        const { data } = await api.post("/api/users", userData);
         return data.user;
     } catch (err) {
         return rejectWithValue(err.response?.data?.message || "Failed to create user");
@@ -21,7 +21,7 @@ export const createUser = createAsyncThunk("users/create", async (userData, { re
 
 export const updateUser = createAsyncThunk("users/update", async ({ id, ...userData }, { rejectWithValue }) => {
     try {
-        const { data } = await api.put(`/users/${id}`, userData);
+        const { data } = await api.put(`/api/users/${id}`, userData);
         return data.user;
     } catch (err) {
         return rejectWithValue(err.response?.data?.message || "Failed to update user");
@@ -30,7 +30,7 @@ export const updateUser = createAsyncThunk("users/update", async ({ id, ...userD
 
 export const deleteUser = createAsyncThunk("users/delete", async (id, { rejectWithValue }) => {
     try {
-        await api.delete(`/users/${id}`);
+        await api.delete(`/api/users/${id}`);
         return id;
     } catch (err) {
         return rejectWithValue(err.response?.data?.message || "Failed to delete user");
