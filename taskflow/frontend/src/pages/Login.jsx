@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { login } from "../features/auth/authSlice";
 import { useNavigate } from "react-router-dom";
 import "./Login.css";
@@ -12,6 +12,8 @@ export default function Login() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
+  const error = useSelector((state) => state.auth.error);
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
@@ -23,7 +25,7 @@ export default function Login() {
       if (res.role === "MANAGER") navigate("/manager/dashboard");
       if (res.role === "USER") navigate("/user/dashboard");
     } catch (err) {
-      console.error("Login failed", err);
+      // error is handled by Redux now
     } finally {
       setLoading(false);
     }
@@ -58,12 +60,31 @@ export default function Login() {
             />
           </div>
 
+          {/* ❌ Error message */}
+          {error && (
+            <p style={{ color: "red", fontSize: "0.85rem", marginTop: "-8px" }}>
+              {error}
+            </p>
+          )}
+
           <button type="submit" disabled={loading}>
             {loading ? "Signing in..." : "Sign In"}
           </button>
         </form>
 
-        <p className="footer">© {new Date().getFullYear()} TaskFlow</p>
+        <p className="footer">
+          Don’t have an account?{" "}
+          <span
+            style={{ cursor: "pointer", color: "#667eea", fontWeight: 600 }}
+            onClick={() => navigate("/register")}
+          >
+            Sign up
+          </span>
+        </p>
+
+        <p className="footer">
+          © {new Date().getFullYear()} TaskFlow
+        </p>
       </div>
     </div>
   );

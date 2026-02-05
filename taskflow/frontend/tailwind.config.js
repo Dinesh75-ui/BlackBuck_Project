@@ -1,22 +1,25 @@
-// tailwind.config.js
-module.exports = {
-  content: ["./src/**/*.{js,jsx,ts,tsx}"],
+/** @type {import('tailwindcss').Config} */
+export default {
+  content: ["./index.html", "./src/**/*.{js,jsx,ts,tsx}"],
   theme: {
     extend: {
       animation: {
-        gradient: "gradient 10s ease infinite",
-        slideUp: "slideUp 0.8s ease-out",
+        gradientMove: "gradientMove 10s ease infinite",
+        slideUp: "slideUp 0.8s ease",
       },
       keyframes: {
-        gradient: {
+        gradientMove: {
           "0%": { backgroundPosition: "0% 50%" },
           "50%": { backgroundPosition: "100% 50%" },
           "100%": { backgroundPosition: "0% 50%" },
         },
         slideUp: {
-          "0%": { opacity: 0, transform: "translateY(40px)" },
-          "100%": { opacity: 1, transform: "translateY(0)" },
+          from: { opacity: "0", transform: "translateY(40px)" },
+          to: { opacity: "1", transform: "translateY(0)" },
         },
+      },
+      backgroundSize: {
+        "300%": "300% 300%",
       },
     },
   },
