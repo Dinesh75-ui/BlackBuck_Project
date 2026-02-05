@@ -27,16 +27,21 @@ export default function UserDashboard() {
 
   // drag n drop funcs
   const onDragStart = (e, taskId) => {
-    e.dataTransfer.setData("taskId", taskId);
+    e.dataTransfer.setData("text/plain", taskId);
+    e.dataTransfer.effectAllowed = "move";
   };
 
   const onDrop = (e, status) => {
-    const taskId = e.dataTransfer.getData("taskId");
-    dispatch(updateTaskStatus({ id: taskId, status }));
+    e.preventDefault();
+    const taskId = e.dataTransfer.getData("text/plain");
+    if (taskId) {
+      dispatch(updateTaskStatus({ id: taskId, status }));
+    }
   };
 
   const onDragOver = (e) => {
     e.preventDefault();
+    e.dataTransfer.dropEffect = "move";
   };
 
   const filterTasks = (status) => tasks.filter(t => t.status === status);
