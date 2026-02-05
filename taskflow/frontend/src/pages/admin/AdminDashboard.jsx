@@ -36,8 +36,9 @@ export default function AdminDashboard() {
     try {
       if (editingId) {
         // updating user
+        console.log("SUBMITTING PASSWORD:", formData.password ? `YES (Length: ${formData.password.length})` : "NO");
         await dispatch(updateUser({ id: editingId, ...formData })).unwrap();
-        alert("User updated successfully!");
+        alert(`User updated successfully! ${formData.password ? "(Password was included)" : "(No password change)"}`);
         setEditingId(null);
       } else {
         // creating new user

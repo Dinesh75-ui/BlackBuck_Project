@@ -64,13 +64,25 @@ export const updateUser = async (req, res) => {
     const { name, email, role, password } = req.body;
 
     try {
+        console.log(`BACKEND: Update request for user ${id}`, {
+            hasPassword: !!password,
+            passwordLength: password?.length,
+            role
+        });
+
         const updateData = { name, email, role };
 
         // If password is provided, hash it and add to update data
-        if (password && password.trim() !== "") {
+        if (password && typeof password === 'string' && password.trim() !== "") {
+            console.log("BACKEND: Hashing new password...");
             const hashedPassword = await bcrypt.hash(password, 10);
             updateData.password = hashedPassword;
+            console.log("BACKEND: Password hashed successfully.");
+        } else {
+            console.log("BACKEND: No valid password provided, skipping password update.");
         }
+
+        console.log("BACKEND: Executing Prisma update with keys:", Object.keys(updateData));
 
         const user = await prisma.user.update({
             where: { id },
@@ -83,6 +95,7 @@ export const updateUser = async (req, res) => {
             },
         });
 
+        console.log("BACKEND: User updated successfully in DB.");
         res.json({ message: "User updated successfully", user });
     } catch (err) {
         console.error("UPDATE USER ERROR:", err);
