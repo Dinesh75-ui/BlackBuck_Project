@@ -81,7 +81,7 @@ To test the different dashboards, you can use these accounts I created (or creat
 ---
 
 ## 🌐 Deployment
-**Live Link**: [ INSERT YOUR DEPLOYED LINK HERE ]
+**Live Link**: https://blackbuckassessment.vercel.app
 
 ---
 
