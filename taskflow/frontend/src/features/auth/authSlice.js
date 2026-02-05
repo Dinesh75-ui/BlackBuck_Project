@@ -2,10 +2,10 @@ import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import api from "../../api/axios";
 
 export const login = createAsyncThunk(
-  "auth/login",
+  "/api/auth/login",
   async (credentials, { rejectWithValue }) => {
     try {
-      const { data } = await api.post("/auth/login", credentials);
+      const { data } = await api.post("/api/auth/login", credentials);
       localStorage.setItem("token", data.token); // Save token
       localStorage.setItem("user", JSON.stringify(data.user)); // Save user info
       localStorage.setItem("role", data.role); // Save role
