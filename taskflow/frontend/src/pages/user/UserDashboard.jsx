@@ -25,38 +25,43 @@ export default function UserDashboard() {
     navigate("/");
   };
 
-  // drag n drop funcs
-  const onDragStart = (e, taskId) => {
-    e.dataTransfer.setData("text/plain", taskId);
-    e.dataTransfer.effectAllowed = "move";
-  };
-
-  const onDrop = (e, status) => {
-    e.preventDefault();
-    const taskId = e.dataTransfer.getData("text/plain");
-    if (taskId) {
-      dispatch(updateTaskStatus({ id: taskId, status }));
-    }
-  };
-
-  const onDragOver = (e) => {
-    e.preventDefault();
-    e.dataTransfer.dropEffect = "move";
-  };
-
   const filterTasks = (status) => tasks.filter(t => t.status === status);
 
   // Task card component
   const TaskCard = ({ task }) => (
-    <div
-      draggable
-      onDragStart={(e) => onDragStart(e, task.id)}
-      className="bg-white p-3 rounded shadow-sm mb-2 cursor-grab hover:shadow-md transition border border-gray-100"
-    >
+    <div className="bg-white p-4 rounded shadow-sm mb-3 hover:shadow-md transition border border-gray-100">
       <h4 className="font-bold text-gray-800 text-sm">{task.title}</h4>
       <p className="text-xs text-gray-500 mt-1 line-clamp-2">{task.description}</p>
       <div className="mt-2 text-[10px] text-gray-400 font-semibold uppercase tracking-wide">
         {task.project?.name}
+      </div>
+
+      {/* Mobile-friendly status buttons */}
+      <div className="mt-4 pt-3 border-t flex flex-wrap gap-2">
+        {task.status !== "TODO" && (
+          <button
+            onClick={() => dispatch(updateTaskStatus({ id: task.id, status: "TODO" }))}
+            className="text-[10px] bg-gray-100 hover:bg-gray-200 px-3 py-1.5 rounded-md font-bold text-gray-600 uppercase transition"
+          >
+            To Do
+          </button>
+        )}
+        {task.status !== "IN_PROGRESS" && (
+          <button
+            onClick={() => dispatch(updateTaskStatus({ id: task.id, status: "IN_PROGRESS" }))}
+            className="text-[10px] bg-blue-50 hover:bg-blue-100 px-3 py-1.5 rounded-md font-bold text-blue-600 uppercase transition"
+          >
+            Doing
+          </button>
+        )}
+        {task.status !== "DONE" && (
+          <button
+            onClick={() => dispatch(updateTaskStatus({ id: task.id, status: "DONE" }))}
+            className="text-[10px] bg-green-50 hover:bg-green-100 px-3 py-1.5 rounded-md font-bold text-green-700 uppercase transition"
+          >
+            Done
+          </button>
+        )}
       </div>
     </div>
   );
@@ -94,8 +99,6 @@ export default function UserDashboard() {
 
             {/* To Do Col */}
             <div
-              onDrop={(e) => onDrop(e, "TODO")}
-              onDragOver={onDragOver}
               className="bg-gray-200 p-3 rounded-lg min-h-[400px]"
             >
               <h3 className="font-bold text-gray-600 mb-3 text-sm flex justify-between">
@@ -107,8 +110,6 @@ export default function UserDashboard() {
 
             {/* In Progress Col */}
             <div
-              onDrop={(e) => onDrop(e, "IN_PROGRESS")}
-              onDragOver={onDragOver}
               className="bg-blue-100 p-3 rounded-lg min-h-[400px]"
             >
               <h3 className="font-bold text-blue-700 mb-3 text-sm flex justify-between">
@@ -119,8 +120,6 @@ export default function UserDashboard() {
 
             {/* Done Col */}
             <div
-              onDrop={(e) => onDrop(e, "DONE")}
-              onDragOver={onDragOver}
               className="bg-green-100 p-3 rounded-lg min-h-[400px]"
             >
               <h3 className="font-bold text-green-700 mb-3 text-sm flex justify-between">
