@@ -1,105 +1,100 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import "./Login.css";
+import api from "../api/axios";
 
 export default function Register() {
-  const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [previewRole, setPreviewRole] = useState("USER");
+  const [formData, setFormData] = useState({ name: "", email: "", password: "" });
+  const [error, setError] = useState(null);
   const [loading, setLoading] = useState(false);
-
   const navigate = useNavigate();
-
-  // 🔍 Role preview based on email
-  const detectRole = (emailValue) => {
-    if (emailValue.endsWith("@admin.com")) return "ADMIN";
-    if (emailValue.endsWith("@manager.com")) return "MANAGER";
-    return "USER";
-  };
-
-  const handleEmailChange = (e) => {
-    const value = e.target.value;
-    setEmail(value);
-    setPreviewRole(detectRole(value));
-  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
+    setError(null);
 
     try {
-      const res = await fetch("http://localhost:5000/api/auth/register", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name, email, password }),
-      });
-
-      const data = await res.json();
-
-      if (!res.ok) {
-        throw new Error(data.message || "Registration failed");
-      }
-
-      navigate("/login");
+      await api.post("/auth/register", formData);
+      alert("Registration Done! Please login now.");
+      navigate("/");
     } catch (err) {
-      alert(err.message);
+      setError(err.response?.data?.message || "Registration failed");
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="login-page">
-      <div className="login-card">
-        <div className="login-header">
-          <h1>TaskFlow</h1>
-          <p>Create your account</p>
-        </div>
+    <div className="flex min-h-screen items-center justify-center bg-gray-100 px-4">
+      {/* Registration Card */}
+      <div className="w-full max-w-lg bg-white p-10 rounded-xl shadow-lg">
+        <h1 className="text-3xl font-extrabold text-center text-gray-800 mb-2 tracking-tight">
+          Join TaskFlow
+        </h1>
+        <p className="text-sm text-center text-gray-400 mb-8 italic">
+          (Note: Use @admin.com for Admin access)
+        </p>
 
-        <form onSubmit={handleSubmit} className="login-form">
-          <div className="form-group">
-            <label>Name</label>
-            <input required onChange={(e) => setName(e.target.value)} />
-          </div>
+        <form onSubmit={handleSubmit} className="space-y-6">
 
-          <div className="form-group">
-            <label>Email</label>
-            <input required onChange={handleEmailChange} />
-          </div>
-
-          <div className="form-group">
-            <label>Password</label>
+          <div>
+            <label className="block text-sm font-bold text-gray-600 mb-2">Full Name</label>
             <input
-              type="password"
+              type="text"
+              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
+              placeholder="John Doe"
+              value={formData.name}
+              onChange={(e) => setFormData({ ...formData, name: e.target.value })}
               required
-              onChange={(e) => setPassword(e.target.value)}
             />
           </div>
 
-          {/* 🔐 Role Preview */}
-          <div className="form-group">
-            <label>Role (auto-assigned)</label>
-            <input value={previewRole} disabled />
-            <small style={{ color: "#777", marginTop: "4px" }}>
-              Role is assigned automatically based on email domain
-            </small>
+          <div>
+            <label className="block text-sm font-bold text-gray-600 mb-2">Email Address</label>
+            <input
+              type="email"
+              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
+              placeholder="john@example.com"
+              value={formData.email}
+              onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+              required
+            />
           </div>
 
-          <button type="submit" disabled={loading}>
-            {loading ? "Creating account..." : "Register"}
+          <div>
+            <label className="block text-sm font-bold text-gray-600 mb-2">Password</label>
+            <input
+              type="password"
+              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
+              placeholder="Create a password"
+              value={formData.password}
+              onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+              required
+            />
+          </div>
+
+          {error && <div className="text-red-500 text-sm text-center font-semibold">{error}</div>}
+
+          <button
+            type="submit"
+            disabled={loading}
+            className="w-full bg-blue-600 text-white py-3 rounded-lg font-bold text-lg hover:bg-blue-700 transition duration-200 disabled:opacity-70 shadow-md"
+          >
+            {loading ? "Creating..." : "Sign Up"}
           </button>
         </form>
 
-        <p className="footer">
-          Already have an account?{" "}
-          <span
-            style={{ cursor: "pointer", color: "#667eea", fontWeight: 600 }}
-            onClick={() => navigate("/login")}
-          >
-            Login
-          </span>
-        </p>
+        <div className="mt-8 text-center">
+          <p className="text-gray-500">
+            Already have an account?{" "}
+            <button
+              onClick={() => navigate("/")}
+              className="text-blue-600 hover:text-blue-800 font-bold transition"
+            >
+              Sign In
+            </button>
+          </p>
+        </div>
       </div>
     </div>
   );

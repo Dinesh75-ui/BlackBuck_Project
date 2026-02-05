@@ -16,6 +16,7 @@ model User {
   role     Role      @default(USER)
   Project  Project[]
   tasks    Task[]    @relation("AssignedTasks")
+  projects Project[] @relation("ProjectMembers")
 }
 
 model Project {
@@ -25,6 +26,7 @@ model Project {
   managerId   String
   User        User   @relation(fields: [managerId], references: [id])
   tasks       Task[]
+  members     User[] @relation("ProjectMembers")
 }
 
 model Task {

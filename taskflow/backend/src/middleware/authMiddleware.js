@@ -1,83 +1,29 @@
-import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
-import { PrismaClient } from "@prisma/client";
 
-const prisma = new PrismaClient();
+export const verifyToken = (req, res, next) => {
+  // Get token from header (Authorization: Bearer <token>)
+  const authHeader = req.headers.authorization;
 
-/* REGISTER */
-export const register = async (req, res) => {
-  const { name, email, password } = req.body;
+  if (!authHeader || !authHeader.startsWith("Bearer ")) {
+    return res.status(401).json({ message: "Access Denied. No token provided." });
+  }
+
+  const token = authHeader.split(" ")[1];
 
   try {
-    const existingUser = await prisma.user.findUnique({
-      where: { email },
-    });
-
-    if (existingUser) {
-      return res.status(400).json({ message: "Email already exists" });
-    }
-
-    // ✅ FORCE ROLE BASED ON EMAIL DOMAIN
-    const role = email.endsWith("@admin.com")
-      ? "ADMIN"
-      : email.endsWith("@manager.com")
-      ? "MANAGER"
-      : "USER";
-
-    const hashedPassword = await bcrypt.hash(password, 10);
-
-    const user = await prisma.user.create({
-      data: {
-        name,
-        email,
-        password: hashedPassword,
-        role, // 👈 THIS IS THE FIX
-      },
-    });
-
-    res.status(201).json({
-      message: "User registered successfully",
-      user: {
-        id: user.id,
-        email: user.email,
-        role: user.role,
-      },
-    });
+    const verified = jwt.verify(token, process.env.JWT_SECRET);
+    req.user = verified;
+    next();
   } catch (err) {
-    console.error(err);
-    res.status(500).json({ message: "Registration failed" });
+    res.status(403).json({ message: "Invalid Token" });
   }
 };
 
-/* LOGIN */
-export const login = async (req, res) => {
-  const { email, password } = req.body;
-
-  try {
-    const user = await prisma.user.findUnique({
-      where: { email },
-    });
-
-    if (!user) {
-      return res.status(401).json({ message: "Invalid credentials" });
+export const authorizeRoles = (...roles) => {
+  return (req, res, next) => {
+    if (!req.user || !roles.includes(req.user.role)) {
+      return res.status(403).json({ message: `Access Denied. Role ${req.user?.role} is not authorized.` });
     }
-
-    const isMatch = await bcrypt.compare(password, user.password);
-    if (!isMatch) {
-      return res.status(401).json({ message: "Invalid credentials" });
-    }
-
-    const token = jwt.sign(
-      { id: user.id, role: user.role },
-      process.env.JWT_SECRET,
-      { expiresIn: "1d" }
-    );
-
-    res.json({
-      token,
-      role: user.role, // ✅ correct
-    });
-  } catch (err) {
-    res.status(500).json({ message: "Login failed" });
-  }
+    next();
+  };
 };

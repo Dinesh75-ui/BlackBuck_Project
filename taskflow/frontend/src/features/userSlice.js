@@ -1,0 +1,74 @@
+import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
+import api from "../api/axios";
+
+export const fetchUsers = createAsyncThunk("users/fetchAll", async (_, { rejectWithValue }) => {
+    try {
+        const { data } = await api.get("/users");
+        return data;
+    } catch (err) {
+        return rejectWithValue(err.response?.data?.message || "Failed to fetch users");
+    }
+});
+
+export const createUser = createAsyncThunk("users/create", async (userData, { rejectWithValue }) => {
+    try {
+        const { data } = await api.post("/users", userData);
+        return data.user;
+    } catch (err) {
+        return rejectWithValue(err.response?.data?.message || "Failed to create user");
+    }
+});
+
+export const updateUser = createAsyncThunk("users/update", async ({ id, ...userData }, { rejectWithValue }) => {
+    try {
+        const { data } = await api.put(`/users/${id}`, userData);
+        return data.user;
+    } catch (err) {
+        return rejectWithValue(err.response?.data?.message || "Failed to update user");
+    }
+});
+
+export const deleteUser = createAsyncThunk("users/delete", async (id, { rejectWithValue }) => {
+    try {
+        await api.delete(`/users/${id}`);
+        return id;
+    } catch (err) {
+        return rejectWithValue(err.response?.data?.message || "Failed to delete user");
+    }
+});
+
+const userSlice = createSlice({
+    name: "users",
+    initialState: {
+        list: [],
+        loading: false,
+        error: null,
+    },
+    reducers: {},
+    extraReducers: (builder) => {
+        builder
+            .addCase(fetchUsers.pending, (state) => { state.loading = true; state.error = null; })
+            .addCase(fetchUsers.fulfilled, (state, action) => {
+                state.loading = false;
+                state.list = action.payload;
+            })
+            .addCase(fetchUsers.rejected, (state, action) => {
+                state.loading = false;
+                state.error = action.payload;
+            })
+            .addCase(createUser.fulfilled, (state, action) => {
+                state.list.push(action.payload);
+            })
+            .addCase(updateUser.fulfilled, (state, action) => {
+                const index = state.list.findIndex(u => u.id === action.payload.id);
+                if (index !== -1) {
+                    state.list[index] = action.payload;
+                }
+            })
+            .addCase(deleteUser.fulfilled, (state, action) => {
+                state.list = state.list.filter(user => user.id !== action.payload);
+            });
+    },
+});
+
+export default userSlice.reducer;
