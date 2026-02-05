@@ -14,6 +14,7 @@ const app = express();
 const allowedOrigins = [
   "http://localhost:5173",
   "https://blackbuckassessment.vercel.app",
+  process.env.FRONTEND_URL, // Dynamic frontend URL from env
 ];
 
 app.use(

@@ -24,10 +24,10 @@ export default function Login() {
       else if (res.role === "MANAGER") navigate("/manager/dashboard");
       else navigate("/user/dashboard");
     } catch (err) {
-  console.error("LOGIN ERROR:", err);
-  res.status(500).json({ message: "Login failed" });
-}
- finally {
+      console.error("LOGIN ERROR:", err);
+      // Removed invalid server-side response code that caused crash
+    }
+    finally {
       setLoading(false);
     }
   };
