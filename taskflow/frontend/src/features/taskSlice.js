@@ -13,9 +13,12 @@ export const fetchTasks = createAsyncThunk("tasks/fetchAll", async (projectId, {
 
 export const createTask = createAsyncThunk("tasks/create", async (taskData, { rejectWithValue }) => {
     try {
+        console.log("FRONTEND: Creating task", taskData);
         const { data } = await api.post("/api/tasks", taskData);
+        console.log("FRONTEND: createTask success", data);
         return data;
     } catch (err) {
+        console.error("FRONTEND: createTask fail", err.response?.data || err.message);
         return rejectWithValue(err.response?.data?.message || "Failed to create task");
     }
 });

@@ -31,18 +31,24 @@ export default function AdminDashboard() {
   };
 
   // submitting form
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    if (editingId) {
-      // updating user
-      dispatch(updateUser({ id: editingId, ...formData }));
-      setEditingId(null);
-    } else {
-      // creating new user
-      dispatch(createUser(formData));
+    try {
+      if (editingId) {
+        // updating user
+        await dispatch(updateUser({ id: editingId, ...formData })).unwrap();
+        alert("User updated successfully!");
+        setEditingId(null);
+      } else {
+        // creating new user
+        await dispatch(createUser(formData)).unwrap();
+        alert("User created successfully!");
+      }
+      // reset form
+      setFormData({ name: "", email: "", password: "", role: "USER" });
+    } catch (err) {
+      alert(`Operation failed: ${err}`);
     }
-    // reset form
-    setFormData({ name: "", email: "", password: "", role: "USER" });
   };
 
   const handleEdit = (user) => {

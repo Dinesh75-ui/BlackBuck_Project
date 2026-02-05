@@ -90,6 +90,11 @@ export const updateProject = async (req, res) => {
         const project = await prisma.project.update({
             where: { id },
             data: { name, description },
+            include: {
+                User: { select: { name: true, email: true } },
+                members: { select: { id: true, name: true, email: true } },
+                _count: { select: { tasks: true } }
+            }
         });
         res.json(project);
     } catch (err) {
@@ -110,7 +115,11 @@ export const addMember = async (req, res) => {
                     connect: { id: userId }
                 }
             },
-            include: { members: true }
+            include: {
+                User: { select: { name: true, email: true } },
+                members: { select: { id: true, name: true, email: true } },
+                _count: { select: { tasks: true } }
+            }
         });
         res.json(project);
     } catch (err) {
@@ -130,9 +139,14 @@ export const removeMember = async (req, res) => {
                 members: {
                     disconnect: { id: userId }
                 }
+            },
+            include: {
+                User: { select: { name: true, email: true } },
+                members: { select: { id: true, name: true, email: true } },
+                _count: { select: { tasks: true } }
             }
         });
-        res.json({ message: "Member removed" });
+        res.json(project);
     } catch (err) {
         res.status(500).json({ message: "Failed to remove member" });
     }

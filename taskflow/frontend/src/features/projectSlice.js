@@ -15,9 +15,12 @@ export const fetchProjects = createAsyncThunk("projects/fetchAll", async (_, { r
 // create new project
 export const createProject = createAsyncThunk("projects/create", async (projectData, { rejectWithValue }) => {
     try {
+        console.log("FRONTEND: Creating project", projectData);
         const { data } = await api.post("/api/projects", projectData);
+        console.log("FRONTEND: createProject success", data);
         return data;
     } catch (err) {
+        console.error("FRONTEND: createProject fail", err.response?.data || err.message);
         return rejectWithValue(err.response?.data?.message || "create fail");
     }
 });
@@ -25,9 +28,12 @@ export const createProject = createAsyncThunk("projects/create", async (projectD
 // updating project details
 export const updateProject = createAsyncThunk("projects/update", async ({ id, ...data }, { rejectWithValue }) => {
     try {
+        console.log(`FRONTEND: Updating project ${id}`, data);
         const { data: updatedProject } = await api.put(`/api/projects/${id}`, data);
+        console.log("FRONTEND: updateProject success", updatedProject);
         return updatedProject;
     } catch (err) {
+        console.error("FRONTEND: updateProject fail", err.response?.data || err.message);
         return rejectWithValue(err.response?.data?.message || "update fail");
     }
 });
@@ -35,9 +41,12 @@ export const updateProject = createAsyncThunk("projects/update", async ({ id, ..
 // adding member to team
 export const addMember = createAsyncThunk("projects/addMember", async ({ id, userId }, { rejectWithValue }) => {
     try {
+        console.log(`FRONTEND: Adding member ${userId} to project ${id}`);
         const { data: updatedProject } = await api.post(`/api/projects/${id}/members`, { userId });
+        console.log("FRONTEND: addMember success", updatedProject);
         return updatedProject;
     } catch (err) {
+        console.error("FRONTEND: addMember fail", err.response?.data || err.message);
         return rejectWithValue(err.response?.data?.message || "add memb fail");
     }
 });
@@ -45,9 +54,12 @@ export const addMember = createAsyncThunk("projects/addMember", async ({ id, use
 // remove member from team
 export const removeMember = createAsyncThunk("projects/removeMember", async ({ id, userId }, { rejectWithValue }) => {
     try {
-        await api.delete(`/api/projects/${id}/members/${userId}`);
+        console.log(`FRONTEND: Removing member ${userId} from project ${id}`);
+        const { data } = await api.delete(`/api/projects/${id}/members/${userId}`);
+        console.log("FRONTEND: removeMember success");
         return { id, userId };
     } catch (err) {
+        console.error("FRONTEND: removeMember fail", err.response?.data || err.message);
         return rejectWithValue(err.response?.data?.message || "rm memb fail");
     }
 });

@@ -51,17 +51,26 @@ export default function ManagerDashboard() {
     setActiveTab("projects");
   };
 
-  const handleAddMember = (projectId, userId) => {
+  const handleAddMember = async (projectId, userId) => {
     if (!userId) return;
-    dispatch(addMember({ id: projectId, userId }));
+    try {
+      await dispatch(addMember({ id: projectId, userId })).unwrap();
+      alert("Member added successfully!");
+    } catch (err) {
+      alert(`Error adding member: ${err}`);
+    }
   };
 
-  const handleCreateTask = (e) => {
+  const handleCreateTask = async (e) => {
     e.preventDefault();
-    dispatch(createTask(taskData));
-    // clear form
-    setTaskData({ title: "", description: "", projectId: "", assignedTo: "" });
-    alert("Task Added!");
+    try {
+      await dispatch(createTask(taskData)).unwrap();
+      alert("Task Added Successfully!");
+      // clear form
+      setTaskData({ title: "", description: "", projectId: "", assignedTo: "" });
+    } catch (err) {
+      alert(`Error adding task: ${err}`);
+    }
   };
 
   const handleDeleteTask = (id) => {
@@ -92,8 +101,8 @@ export default function ManagerDashboard() {
             <button
               key={tab}
               className={`pb-2 px-4 capitalize font-semibold transition whitespace-nowrap ${activeTab === tab
-                  ? "border-b-4 border-blue-500 text-blue-600"
-                  : "text-gray-500 hover:text-gray-800"
+                ? "border-b-4 border-blue-500 text-blue-600"
+                : "text-gray-500 hover:text-gray-800"
                 }`}
               onClick={() => setActiveTab(tab)}
             >
