@@ -9,13 +9,13 @@ router.use(verifyToken);
 // All authenticated users can view projects (scoped in controller)
 router.get("/", getProjects);
 
-// Only Managers can create/edit/delete
-router.post("/", authorizeRoles("MANAGER"), createProject);
-router.put("/:id", authorizeRoles("MANAGER"), updateProject);
-router.delete("/:id", authorizeRoles("MANAGER"), deleteProject);
+// Only Managers/Admins can create/edit/delete
+router.post("/", authorizeRoles("MANAGER", "ADMIN"), createProject);
+router.put("/:id", authorizeRoles("MANAGER", "ADMIN"), updateProject);
+router.delete("/:id", authorizeRoles("MANAGER", "ADMIN"), deleteProject);
 
 // Team Management
-router.post("/:id/members", authorizeRoles("MANAGER"), addMember);
-router.delete("/:id/members/:userId", authorizeRoles("MANAGER"), removeMember);
+router.post("/:id/members", authorizeRoles("MANAGER", "ADMIN"), addMember);
+router.delete("/:id/members/:userId", authorizeRoles("MANAGER", "ADMIN"), removeMember);
 
 export default router;

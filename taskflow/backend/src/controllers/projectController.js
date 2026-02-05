@@ -69,6 +69,11 @@ export const createProject = async (req, res) => {
                     connect: { id: managerId } // Manager is automatically a member
                 }
             },
+            include: {
+                User: { select: { name: true, email: true } },
+                members: { select: { id: true, name: true, email: true } },
+                _count: { select: { tasks: true } }
+            }
         });
         res.status(201).json(project);
     } catch (err) {

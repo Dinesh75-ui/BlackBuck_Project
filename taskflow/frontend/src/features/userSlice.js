@@ -21,9 +21,12 @@ export const createUser = createAsyncThunk("users/create", async (userData, { re
 
 export const updateUser = createAsyncThunk("users/update", async ({ id, ...userData }, { rejectWithValue }) => {
     try {
+        console.log(`FRONTEND: Updating user ${id}`, userData);
         const { data } = await api.put(`/api/users/${id}`, userData);
+        console.log("FRONTEND: User update response:", data);
         return data.user;
     } catch (err) {
+        console.error("FRONTEND: User update error:", err.response?.data || err.message);
         return rejectWithValue(err.response?.data?.message || "Failed to update user");
     }
 });

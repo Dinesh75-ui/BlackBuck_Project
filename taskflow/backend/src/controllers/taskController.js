@@ -65,6 +65,10 @@ export const createTask = async (req, res) => {
                 projectId,
                 assignedTo
             },
+            include: {
+                user: { select: { name: true, email: true } },
+                project: { select: { name: true } }
+            }
         });
         res.status(201).json(task);
     } catch (err) {

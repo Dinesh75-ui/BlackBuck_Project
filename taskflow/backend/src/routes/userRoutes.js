@@ -8,7 +8,7 @@ router.use(verifyToken);
 
 router.get("/", authorizeRoles("ADMIN", "MANAGER"), getAllUsers);
 router.post("/", authorizeRoles("ADMIN"), createUser);
-router.put("/:id", updateUser);
-router.delete("/:id", deleteUser);
+router.put("/:id", authorizeRoles("ADMIN"), updateUser);
+router.delete("/:id", authorizeRoles("ADMIN"), deleteUser);
 
 export default router;
