@@ -1,19 +1,21 @@
-datasource db {
-  provider = "postgresql"
-  url      = env("DATABASE_URL")
-}
-
 generator client {
   provider = "prisma-client-js"
 }
 
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
 model User {
-  id       String @id @default(uuid())
+  id       String    @id @default(uuid())
   name     String
-  email    String @unique
+  email    String    @unique
   password String
-  role     Role   @default(USER)
-  tasks    Task[] @relation("AssignedTasks")
+  role     Role      @default(USER)
+  Project  Project[]
+  tasks    Task[]    @relation("AssignedTasks")
 }
 
 model Project {
@@ -21,20 +23,19 @@ model Project {
   name        String
   description String
   managerId   String
+  User        User   @relation(fields: [managerId], references: [id])
   tasks       Task[]
 }
 
 model Task {
-  id          String @id @default(uuid())
+  id          String  @id @default(uuid())
   title       String
   description String
-  status      Status @default(TODO)
-
-  projectId String
-  project   Project @relation(fields: [projectId], references: [id])
-
-  assignedTo String
-  user       User   @relation("AssignedTasks", fields: [assignedTo], references: [id])
+  status      Status  @default(TODO)
+  projectId   String
+  assignedTo  String
+  user        User    @relation("AssignedTasks", fields: [assignedTo], references: [id])
+  project     Project @relation(fields: [projectId], references: [id])
 }
 
 enum Role {
