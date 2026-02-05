@@ -80,15 +80,18 @@ export const updateTask = async (req, res) => {
     const { role, id: userId } = req.user;
 
     try {
+        console.log(`UPDATE TASK: id=${id}, status=${status}, user=${userId}, role=${role}`);
         const task = await prisma.task.findUnique({ where: { id } });
 
         if (!task) {
+            console.log("TASK NOT FOUND");
             return res.status(404).json({ message: "Task not found" });
         }
 
         // User can only update status of their own tasks
         if (role === "USER") {
             if (task.assignedTo !== userId) {
+                console.log(`AUTH DENIED: assignedTo=${task.assignedTo}, actingUser=${userId}`);
                 return res.status(403).json({ message: "Not authorized to update this task" });
             }
             // Users can ONLY update status
@@ -105,11 +108,17 @@ export const updateTask = async (req, res) => {
                 assignedTo: role === "MANAGER" || role === "ADMIN" ? assignedTo : undefined,
                 status,
             },
+            include: {
+                user: { select: { name: true, email: true } },
+                project: { select: { name: true } }
+            }
         });
 
+        console.log("TASK UPDATED SUCCESSFULLY");
         res.json(updatedTask);
     } catch (err) {
-        res.status(500).json({ message: "Failed to update task" });
+        console.error("TASK UPDATE ERROR:", err);
+        res.status(500).json({ message: "Failed to update task", error: err.message });
     }
 };
 

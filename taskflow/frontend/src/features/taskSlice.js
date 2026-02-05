@@ -22,9 +22,12 @@ export const createTask = createAsyncThunk("tasks/create", async (taskData, { re
 
 export const updateTaskStatus = createAsyncThunk("tasks/updateStatus", async ({ id, status }, { rejectWithValue }) => {
     try {
+        console.log(`FRONTEND: Requesting task update id=${id}, status=${status}`);
         const { data } = await api.patch(`/api/tasks/${id}`, { status });
+        console.log("FRONTEND: Update success data:", data);
         return data;
     } catch (err) {
+        console.error("FRONTEND: Update error:", err.response?.data || err.message);
         return rejectWithValue(err.response?.data?.message || "Failed to update task");
     }
 });
@@ -61,10 +64,15 @@ const taskSlice = createSlice({
                 state.list.push(action.payload);
             })
             .addCase(updateTaskStatus.fulfilled, (state, action) => {
+                console.log("REDUX: updateTaskStatus.fulfilled", action.payload);
                 const index = state.list.findIndex(t => t.id === action.payload.id);
                 if (index !== -1) {
                     state.list[index] = action.payload;
                 }
+            })
+            .addCase(updateTaskStatus.rejected, (state, action) => {
+                console.error("REDUX: updateTaskStatus.rejected", action.payload);
+                state.error = action.payload;
             })
             .addCase(deleteTask.fulfilled, (state, action) => {
                 state.list = state.list.filter(t => t.id !== action.payload);
