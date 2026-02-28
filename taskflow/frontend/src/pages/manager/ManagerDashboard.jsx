@@ -10,8 +10,8 @@ import {
   Plus,
   Users,
   CheckSquare,
-  Trash2,
   Edit2,
+  Trash2,
   LogOut,
   Folder,
   UserPlus,
@@ -20,7 +20,8 @@ import {
   ClipboardList,
   Clock,
   CheckCircle2,
-  Calendar
+  Calendar,
+  Menu
 } from "lucide-react";
 
 export default function ManagerDashboard() {
@@ -35,6 +36,7 @@ export default function ManagerDashboard() {
   const [taskData, setTaskData] = useState({ title: "", description: "", projectId: "", assignedTo: "" });
   const [activeTab, setActiveTab] = useState("projects");
   const [showAddProject, setShowAddProject] = useState(false);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   useEffect(() => {
     dispatch(fetchProjects());
@@ -98,44 +100,62 @@ export default function ManagerDashboard() {
   return (
     <div className="min-h-screen bg-[#F8FAFC] flex flex-col lg:flex-row font-sans">
 
-      {/* Sidebar - Desktop */}
-      <aside className="w-full lg:w-64 bg-white border-r border-secondary-200 flex flex-col sticky top-0 lg:h-screen z-40">
-        <div className="p-6">
+      {/* Mobile Sidebar Overlay */}
+      {isMobileMenuOpen && (
+        <div
+          className="fixed inset-0 bg-secondary-900/50 backdrop-blur-sm z-50 lg:hidden"
+          onClick={() => setIsMobileMenuOpen(false)}
+        ></div>
+      )}
+
+      {/* Sidebar */}
+      <aside className={`
+        fixed lg:sticky top-0 left-0 z-50 h-screen w-64 bg-white border-r border-secondary-200 
+        flex flex-col transition-transform duration-300 lg:translate-x-0
+        ${isMobileMenuOpen ? "translate-x-0" : "-translate-x-full"}
+      `}>
+        <div className="p-6 flex items-center justify-between">
           <div className="flex items-center gap-3 text-primary-600 font-extrabold text-2xl tracking-tight">
-            <div className="w-10 h-10 bg-primary-600 rounded-xl flex items-center justify-center text-white">
+            <div className="w-10 h-10 bg-primary-600 rounded-xl flex items-center justify-center text-white shadow-lg shadow-primary-600/20">
               TF
             </div>
             TaskFlow
           </div>
+          <button
+            className="lg:hidden p-2 text-secondary-400 hover:bg-secondary-50 rounded-lg"
+            onClick={() => setIsMobileMenuOpen(false)}
+          >
+            <X className="w-6 h-6" />
+          </button>
         </div>
 
-        <nav className="flex-1 px-4 py-4 space-y-2 flex flex-row lg:flex-col overflow-x-auto lg:overflow-x-visible">
+        <nav className="flex-1 px-4 py-4 space-y-2 flex flex-col overflow-y-auto">
           <button
-            onClick={() => setActiveTab("projects")}
-            className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl font-semibold transition-all whitespace-nowrap
+            onClick={() => { setActiveTab("projects"); setIsMobileMenuOpen(false); }}
+            className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl font-semibold transition-all
               ${activeTab === "projects" ? "bg-primary-50 text-primary-600" : "text-secondary-500 hover:bg-secondary-50"}`}
           >
             <Folder className="w-5 h-5" />
             Projects
           </button>
           <button
-            onClick={() => setActiveTab("team")}
-            className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl font-semibold transition-all whitespace-nowrap
+            onClick={() => { setActiveTab("team"); setIsMobileMenuOpen(false); }}
+            className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl font-semibold transition-all
               ${activeTab === "team" ? "bg-primary-50 text-primary-600" : "text-secondary-500 hover:bg-secondary-50"}`}
           >
             <Users className="w-5 h-5" />
             Manage Team
           </button>
           <button
-            onClick={() => setActiveTab("tasks")}
-            className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl font-semibold transition-all whitespace-nowrap
+            onClick={() => { setActiveTab("tasks"); setIsMobileMenuOpen(false); }}
+            className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl font-semibold transition-all
               ${activeTab === "tasks" ? "bg-primary-50 text-primary-600" : "text-secondary-500 hover:bg-secondary-50"}`}
           >
             <CheckSquare className="w-5 h-5" />
             Manage Tasks
           </button>
 
-          <div className="lg:mt-auto border-t lg:border-none pt-4 lg:pt-0">
+          <div className="mt-auto border-t border-secondary-100 pt-4">
             <button
               onClick={handleLogout}
               className="w-full flex items-center gap-3 px-4 py-3 rounded-xl font-semibold text-red-500 hover:bg-red-50 transition-all group"
@@ -149,9 +169,17 @@ export default function ManagerDashboard() {
 
       <main className="flex-1 min-h-screen overflow-y-auto">
         <header className="bg-white/80 backdrop-blur-md border-b border-secondary-200 sticky top-0 z-30 px-6 py-4 flex items-center justify-between">
-          <h1 className="text-xl font-bold text-secondary-900 capitalize">
-            {activeTab} Management
-          </h1>
+          <div className="flex items-center gap-4">
+            <button
+              className="lg:hidden p-2 text-secondary-600 hover:bg-secondary-50 rounded-lg"
+              onClick={() => setIsMobileMenuOpen(true)}
+            >
+              <Menu className="w-6 h-6" />
+            </button>
+            <h1 className="text-xl font-bold text-secondary-900 capitalize">
+              {activeTab} Management
+            </h1>
+          </div>
 
           {activeTab === "projects" && (
             <button
@@ -322,7 +350,7 @@ export default function ManagerDashboard() {
                               </div>
                               <button
                                 onClick={() => { if (window.confirm("Remove user?")) dispatch(removeMember({ id: p.id, userId: m.id })) }}
-                                className="p-1.5 text-secondary-400 hover:text-red-500 hover:bg-red-50 rounded-lg opacity-0 group-hover/member:opacity-100 transition-all font-bold"
+                                className="p-1.5 text-secondary-400 hover:text-red-500 hover:bg-red-50 rounded-lg lg:opacity-0 lg:group-hover/member:opacity-100 transition-all font-bold"
                               >
                                 <X className="w-4 h-4" />
                               </button>
@@ -358,7 +386,7 @@ export default function ManagerDashboard() {
                     <div className="space-y-1.5">
                       <label className="text-[10px] font-black text-secondary-400 uppercase tracking-widest px-1">Target Project</label>
                       <select
-                        className="w-full input-field py-3 text-sm appearance-none bg-no-repeat bg-[right_1rem_center]"
+                        className="w-full input-field py-3 !pr-10 text-sm appearance-none bg-no-repeat bg-[right_1rem_center]"
                         style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E")`, backgroundSize: '1rem' }}
                         value={taskData.projectId} onChange={(e) => setTaskData({ ...taskData, projectId: e.target.value, assignedTo: "" })} required
                       >
@@ -370,7 +398,7 @@ export default function ManagerDashboard() {
                     <div className="space-y-1.5">
                       <label className="text-[10px] font-black text-secondary-400 uppercase tracking-widest px-1">Assignee</label>
                       <select
-                        className="w-full input-field py-3 text-sm appearance-none bg-no-repeat bg-[right_1rem_center] disabled:opacity-50"
+                        className="w-full input-field py-3 !pr-10 text-sm appearance-none bg-no-repeat bg-[right_1rem_center] disabled:opacity-50"
                         style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E")`, backgroundSize: '1rem' }}
                         value={taskData.assignedTo} onChange={(e) => setTaskData({ ...taskData, assignedTo: e.target.value })} required
                         disabled={!taskData.projectId}

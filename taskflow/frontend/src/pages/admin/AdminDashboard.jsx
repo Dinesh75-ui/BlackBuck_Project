@@ -4,7 +4,7 @@ import { fetchUsers, createUser, deleteUser, updateUser } from "../../features/u
 import { fetchProjects } from "../../features/projectSlice";
 import { logout } from "../../features/auth/authSlice";
 import { useNavigate } from "react-router-dom";
-import { Users, LayoutGrid, LogOut, UserPlus, Trash2, Edit2, Shield, User as UserIcon, Briefcase, Search, Plus } from "lucide-react";
+import { Users, LayoutGrid, LogOut, UserPlus, Trash2, Edit2, Shield, User as UserIcon, Briefcase, Search, Plus, Menu, X } from "lucide-react";
 
 export default function AdminDashboard() {
   const dispatch = useDispatch();
@@ -15,6 +15,7 @@ export default function AdminDashboard() {
   const [formData, setFormData] = useState({ name: "", email: "", password: "", role: "USER" });
   const [editingId, setEditingId] = useState(null);
   const [showAddUser, setShowAddUser] = useState(false);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   useEffect(() => {
     dispatch(fetchUsers());
@@ -61,27 +62,54 @@ export default function AdminDashboard() {
 
   return (
     <div className="min-h-screen bg-[#F8FAFC] flex">
-      {/* Sidebar - Desktop */}
-      <aside className="w-64 bg-white border-r border-secondary-200 hidden lg:flex flex-col sticky top-0 h-screen">
-        <div className="p-6">
+      {/* Mobile Sidebar Overlay */}
+      {isMobileMenuOpen && (
+        <div
+          className="fixed inset-0 bg-secondary-900/50 backdrop-blur-sm z-40 lg:hidden"
+          onClick={() => setIsMobileMenuOpen(false)}
+        ></div>
+      )}
+
+      {/* Sidebar */}
+      <aside className={`
+        fixed lg:sticky top-0 left-0 z-50 h-screen w-64 bg-white border-r border-secondary-200 
+        flex flex-col transition-transform duration-300 lg:translate-x-0
+        ${isMobileMenuOpen ? "translate-x-0" : "-translate-x-full"}
+      `}>
+        <div className="p-6 flex items-center justify-between">
           <div className="flex items-center gap-3 text-primary-600 font-extrabold text-2xl tracking-tight">
             <div className="w-10 h-10 bg-primary-600 rounded-xl flex items-center justify-center text-white">
               TF
             </div>
             TaskFlow
           </div>
+          <button
+            className="lg:hidden p-2 text-secondary-400 hover:bg-secondary-50 rounded-lg"
+            onClick={() => setIsMobileMenuOpen(false)}
+          >
+            <X className="w-6 h-6" />
+          </button>
         </div>
 
         <nav className="flex-1 px-4 py-4 space-y-1">
-          <button className="w-full flex items-center gap-3 px-4 py-3 bg-primary-50 text-primary-600 rounded-xl font-semibold transition-all">
+          <button
+            className="w-full flex items-center gap-3 px-4 py-3 bg-primary-50 text-primary-600 rounded-xl font-semibold transition-all"
+            onClick={() => setIsMobileMenuOpen(false)}
+          >
             <LayoutGrid className="w-5 h-5" />
             Dashboard
           </button>
-          <button className="w-full flex items-center gap-3 px-4 py-3 text-secondary-500 hover:bg-secondary-50 rounded-xl font-medium transition-all group">
+          <button
+            className="w-full flex items-center gap-3 px-4 py-3 text-secondary-500 hover:bg-secondary-50 rounded-xl font-medium transition-all group"
+            onClick={() => setIsMobileMenuOpen(false)}
+          >
             <Users className="w-5 h-5 group-hover:text-primary-500" />
             Users
           </button>
-          <button className="w-full flex items-center gap-3 px-4 py-3 text-secondary-500 hover:bg-secondary-50 rounded-xl font-medium transition-all group">
+          <button
+            className="w-full flex items-center gap-3 px-4 py-3 text-secondary-500 hover:bg-secondary-50 rounded-xl font-medium transition-all group"
+            onClick={() => setIsMobileMenuOpen(false)}
+          >
             <Briefcase className="w-5 h-5 group-hover:text-primary-500" />
             Projects
           </button>
@@ -101,8 +129,16 @@ export default function AdminDashboard() {
       <main className="flex-1 min-h-screen overflow-y-auto">
         {/* Top Header */}
         <header className="bg-white/80 backdrop-blur-md border-b border-secondary-200 sticky top-0 z-30 px-6 py-4 flex items-center justify-between">
-          <h1 className="text-xl font-bold text-secondary-900 lg:hidden">TaskFlow</h1>
-          <h1 className="text-xl font-bold text-secondary-900 hidden lg:block">Admin Overview</h1>
+          <div className="flex items-center gap-4">
+            <button
+              className="lg:hidden p-2 text-secondary-600 hover:bg-secondary-50 rounded-lg"
+              onClick={() => setIsMobileMenuOpen(true)}
+            >
+              <Menu className="w-6 h-6" />
+            </button>
+            <h1 className="text-xl font-bold text-secondary-900 lg:hidden">TaskFlow</h1>
+            <h1 className="text-xl font-bold text-secondary-900 hidden lg:block">Admin Overview</h1>
+          </div>
 
           <div className="flex items-center gap-4">
             <div className="relative hidden md:block">
@@ -214,7 +250,7 @@ export default function AdminDashboard() {
                       <label className="text-xs font-bold text-secondary-500 uppercase px-1">User Role</label>
                       <select
                         name="role" value={formData.role} onChange={handleChange}
-                        className="input-field py-2 appearance-none bg-no-repeat bg-[right_1rem_center]"
+                        className="input-field py-2 !pr-10 appearance-none bg-no-repeat bg-[right_1rem_center]"
                         style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E")`, backgroundSize: '1.2rem' }}
                       >
                         <option value="USER">Standard User</option>
@@ -283,7 +319,7 @@ export default function AdminDashboard() {
                             </span>
                           </td>
                           <td className="px-6 py-4 text-right">
-                            <div className="flex items-center justify-end gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                            <div className="flex items-center justify-end gap-1 lg:opacity-0 lg:group-hover:opacity-100 transition-opacity">
                               <button
                                 onClick={() => handleEdit(user)}
                                 className="p-2 text-secondary-400 hover:text-primary-600 hover:bg-primary-50 rounded-lg transition-all"

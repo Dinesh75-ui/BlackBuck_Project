@@ -18,7 +18,9 @@ import {
   ChevronRight,
   MoreVertical,
   Calendar,
-  Layers
+  Layers,
+  Menu,
+  X
 } from "lucide-react";
 
 export default function UserDashboard() {
@@ -27,6 +29,7 @@ export default function UserDashboard() {
   const { list: tasks } = useSelector((state) => state.tasks);
   const { list: projects } = useSelector((state) => state.projects);
   const user = useSelector((state) => state.auth.user);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   useEffect(() => {
     dispatch(fetchTasks());
@@ -54,20 +57,41 @@ export default function UserDashboard() {
   return (
     <div className="min-h-screen bg-[#F8FAFC] flex flex-col lg:flex-row font-sans">
 
-      {/* Sidebar - Desktop */}
-      <aside className="w-full lg:w-64 bg-white border-r border-secondary-200 flex flex-col sticky top-0 lg:h-screen z-40">
-        <div className="p-6">
+      {/* Mobile Sidebar Overlay */}
+      {isMobileMenuOpen && (
+        <div
+          className="fixed inset-0 bg-secondary-900/50 backdrop-blur-sm z-50 lg:hidden"
+          onClick={() => setIsMobileMenuOpen(false)}
+        ></div>
+      )}
+
+      {/* Sidebar */}
+      <aside className={`
+        fixed lg:sticky top-0 left-0 z-50 h-screen w-64 bg-white border-r border-secondary-200 
+        flex flex-col transition-transform duration-300 lg:translate-x-0
+        ${isMobileMenuOpen ? "translate-x-0" : "-translate-x-full"}
+      `}>
+        <div className="p-6 flex items-center justify-between">
           <div className="flex items-center gap-3 text-primary-600 font-extrabold text-2xl tracking-tight">
             <div className="w-10 h-10 bg-primary-600 rounded-xl flex items-center justify-center text-white shadow-lg shadow-primary-600/20">
               TF
             </div>
             TaskFlow
           </div>
+          <button
+            className="lg:hidden p-2 text-secondary-400 hover:bg-secondary-50 rounded-lg"
+            onClick={() => setIsMobileMenuOpen(false)}
+          >
+            <X className="w-6 h-6" />
+          </button>
         </div>
 
-        <nav className="flex-1 px-4 py-4 space-y-2">
+        <nav className="flex-1 px-4 py-4 space-y-2 flex flex-col overflow-y-auto">
           <div className="px-4 py-2 text-[10px] font-black text-secondary-400 uppercase tracking-widest">Workspace</div>
-          <button className="w-full flex items-center gap-3 px-4 py-3 rounded-xl font-semibold bg-primary-50 text-primary-600 transition-all">
+          <button
+            className="w-full flex items-center gap-3 px-4 py-3 rounded-xl font-semibold bg-primary-50 text-primary-600 transition-all"
+            onClick={() => setIsMobileMenuOpen(false)}
+          >
             <Layout className="w-5 h-5" />
             My Board
           </button>
@@ -75,7 +99,11 @@ export default function UserDashboard() {
           <div className="pt-4 px-4 py-2 text-[10px] font-black text-secondary-400 uppercase tracking-widest">My Projects</div>
           <div className="space-y-1 max-h-[300px] overflow-y-auto pr-2 scrollbar-hide">
             {projects.slice(0, 5).map(p => (
-              <button key={p.id} className="w-full flex items-center gap-3 px-4 py-2.5 rounded-xl font-medium text-secondary-500 hover:bg-secondary-50 transition-all text-sm group">
+              <button
+                key={p.id}
+                className="w-full flex items-center gap-3 px-4 py-2.5 rounded-xl font-medium text-secondary-500 hover:bg-secondary-50 transition-all text-sm group"
+                onClick={() => setIsMobileMenuOpen(false)}
+              >
                 <Folder className="w-4 h-4 group-hover:text-primary-500" />
                 <span className="truncate">{p.name}</span>
               </button>
@@ -98,6 +126,12 @@ export default function UserDashboard() {
       <main className="flex-1 flex flex-col min-w-0">
         <header className="bg-white/80 backdrop-blur-md border-b border-secondary-200 sticky top-0 z-30 px-6 py-4 flex items-center justify-between">
           <div className="flex items-center gap-4 flex-1">
+            <button
+              className="lg:hidden p-2 text-secondary-600 hover:bg-secondary-50 rounded-lg"
+              onClick={() => setIsMobileMenuOpen(true)}
+            >
+              <Menu className="w-6 h-6" />
+            </button>
             <h1 className="text-xl font-bold text-secondary-900 hidden md:block">Kanban Board</h1>
             <div className="relative flex-1 max-w-md hidden sm:block">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-secondary-400" />

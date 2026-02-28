@@ -32,7 +32,7 @@ export default function Register() {
       <div className="absolute bottom-0 -right-20 w-80 h-80 bg-purple-500 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-pulseSlow" style={{ animationDelay: '2s' }}></div>
 
       <div className="w-full max-w-md animate-slideUp">
-        <div className="glass-card p-8 rounded-3xl border border-white/20 relative z-10">
+        <div className="glass-card p-6 sm:p-8 rounded-3xl border border-white/20 relative z-10">
           <div className="text-center mb-10">
             <div className="inline-flex items-center justify-center w-16 h-16 bg-primary-600 rounded-2xl shadow-lg shadow-primary-600/30 mb-4 animate-bounce-subtle">
               <User className="w-8 h-8 text-white" />
