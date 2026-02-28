@@ -13,24 +13,18 @@ export const fetchTasks = createAsyncThunk("tasks/fetchAll", async (projectId, {
 
 export const createTask = createAsyncThunk("tasks/create", async (taskData, { rejectWithValue }) => {
     try {
-        console.log("FRONTEND: Creating task", taskData);
         const { data } = await api.post("/api/tasks", taskData);
-        console.log("FRONTEND: createTask success", data);
         return data;
     } catch (err) {
-        console.error("FRONTEND: createTask fail", err.response?.data || err.message);
         return rejectWithValue(err.response?.data?.message || "Failed to create task");
     }
 });
 
 export const updateTaskStatus = createAsyncThunk("tasks/updateStatus", async ({ id, status }, { rejectWithValue }) => {
     try {
-        console.log(`FRONTEND: Requesting task update id=${id}, status=${status}`);
         const { data } = await api.patch(`/api/tasks/${id}`, { status });
-        console.log("FRONTEND: Update success data:", data);
         return data;
     } catch (err) {
-        console.error("FRONTEND: Update error:", err.response?.data || err.message);
         return rejectWithValue(err.response?.data?.message || "Failed to update task");
     }
 });

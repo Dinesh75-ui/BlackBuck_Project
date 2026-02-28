@@ -3,47 +3,36 @@ import api from "../api/axios";
 
 export const fetchUsers = createAsyncThunk("users/fetchAll", async (_, { rejectWithValue }) => {
     try {
-        console.log("FRONTEND: Fetching all users");
         const { data } = await api.get("/api/users");
         return data;
     } catch (err) {
-        console.error("FRONTEND: fetchUsers fail", err.response?.data || err.message);
         return rejectWithValue(err.response?.data?.message || "Failed to fetch users");
     }
 });
 
 export const createUser = createAsyncThunk("users/create", async (userData, { rejectWithValue }) => {
     try {
-        console.log("FRONTEND: Creating user", userData);
         const { data } = await api.post("/api/users", userData);
-        console.log("FRONTEND: createUser success", data);
         return data.user;
     } catch (err) {
-        console.error("FRONTEND: createUser fail", err.response?.data || err.message);
         return rejectWithValue(err.response?.data?.message || "Failed to create user");
     }
 });
 
 export const updateUser = createAsyncThunk("users/update", async ({ id, ...userData }, { rejectWithValue }) => {
     try {
-        console.log(`FRONTEND: Updating user ${id}`, userData);
         const { data } = await api.put(`/api/users/${id}`, userData);
-        console.log("FRONTEND: User update response:", data);
         return data.user;
     } catch (err) {
-        console.error("FRONTEND: User update error:", err.response?.data || err.message);
         return rejectWithValue(err.response?.data?.message || "Failed to update user");
     }
 });
 
 export const deleteUser = createAsyncThunk("users/delete", async (id, { rejectWithValue }) => {
     try {
-        console.log(`FRONTEND: Deleting user ${id}`);
         await api.delete(`/api/users/${id}`);
-        console.log("FRONTEND: deleteUser success");
         return id;
     } catch (err) {
-        console.error("FRONTEND: deleteUser fail", err.response?.data || err.message);
         return rejectWithValue(err.response?.data?.message || "Failed to delete user");
     }
 });
